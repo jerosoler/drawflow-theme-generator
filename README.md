@@ -6,7 +6,7 @@ Edit a [Drawflow](https://github.com/jerosoler/Drawflow) package.
 
 [PLAY](https://jerosoler.github.io/drawflow-theme-generator/)
 
-# Edit
+# Edit Options
 - Theme
 - Node
 - Input
@@ -14,6 +14,8 @@ Edit a [Drawflow](https://github.com/jerosoler/Drawflow) package.
 - Line
 - Reroute
 - Delete
+
+# Export CSS with custom variables
 
 # License
 MIT License
