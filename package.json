@@ -1,0 +1,27 @@
+{
+  "name": "drawflow-theme-generator",
+  "version": "1.0.0",
+  "description": "Drawflo theme generator",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "drawflow": "0.0.25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jerosoler/drawflow-theme-generator.git"
+  },
+  "keywords": [
+    "Drawflow",
+    "theme",
+    "generator"
+  ],
+  "author": "Jero Soler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jerosoler/drawflow-theme-generator/issues"
+  },
+  "homepage": "https://github.com/jerosoler/drawflow-theme-generator#readme"
+}
