@@ -28,6 +28,16 @@ html, body {
   top: 10px;
 }
 
+.github-link {
+  position: absolute;
+  top: 5px;
+  right: 140px;
+  color: black;
+}
+.github-link a {
+  color: black;
+}
+
 .el-dialog__body pre {
   border-radius: 4px;
 }
