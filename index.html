@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Drawflow theme generator">
+  <meta name="keywords" content="drawflow, theme, generator, style">
+  <meta name="author" content="Jero Soler">
+
+  <title>Drawflow Theme Generator</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/themes/prism.min.css" integrity="sha256-cuvic28gVvjQIo3Q4hnRpQSNB0aMw3C+kjkR0i+hrWg=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/themes/prism-tomorrow.min.css" integrity="sha256-xevuwyBEb2ZYh4nDhj0g3Z/rDBnM569hg9Vq6gEw/Sg=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+  <link rel="stylesheet" href="src/style.css">
+
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+
+
+
+</head>
+<body id="container">
+<div id="app">
+  <div id="header">
+    <h1>🎨 Drawflow Theme Generator</h1>
+    <el-button @click="exportTheme" class="exportButton">Export</el-button>
+  </div>
+  <el-row class="panel">
+    <el-col :span="18" class="drawflow-div"><div id="drawflow"><el-button @click="exportDf()" style="display:none;">Export</el-button></div></el-col>
+    <el-col :span="6" class="col-right">
+
+      <el-collapse v-model="activeNames" >
+        <el-collapse-item title="Theme" name="1">
+
+          <div class="select">
+            <span>Type Background</span>
+            <el-select v-model="SelectBackground" placeholder="Select" size="mini" @change="ChangeBackground()">
+              <el-option
+                v-for="item in SelectBackgroundOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+
+          <div class="color">
+            <span>Background</span>
+            <el-color-picker v-model="dfBackgroundColor" show-alpha @active-change="dfBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number" v-if="SelectBackground !== 'color'">
+            <span>Background size</span>
+             <el-input-number :min="0" v-model="dfBackgroundSize" @change="dfBackgroundSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color" v-if="SelectBackground !== 'color'">
+            <span>Background color line/points</span>
+            <el-color-picker v-model="dfBackgroundImageColor" show-alpha @active-change="dfBackgroundImageColorChange" size="mini"></el-color-picker>
+          </div>
+
+        </el-collapse-item>
+        <el-collapse-item title="Node" name="2">
+          <div class="select">
+            <span>Type Node</span>
+            <el-select v-model="SelectNode" placeholder="Select" size="mini" @change="ChangeNode()">
+              <el-option
+                v-for="item in SelectNodeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfNodeBackgroundColor" show-alpha @active-change="dfNodeBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+          <div class="color">
+            <span>Text color</span>
+            <el-color-picker v-model="dfNodeTextColor" show-alpha @active-change="dfNodeTextColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfNodeBorderSize" @change="dfNodeBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfNodeBorderColor" show-alpha @active-change="dfNodeBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfNodeBorderRadius" @change="dfNodeBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Min height</span>
+             <el-input-number :min="0" v-model="dfNodeMinHeight" @change="dfNodeMinHeightChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Min width</span>
+             <el-input-number :min="0" v-model="dfNodeMinWidth" @change="dfNodeMinWidthChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Padding Top</span>
+             <el-input-number :min="0" v-model="dfNodePaddingTop" @change="dfNodePaddingTopChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Padding Bottom</span>
+             <el-input-number :min="0" v-model="dfNodePaddingBottom" @change="dfNodePaddingBottomChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Horitzontal Length</span>
+             <el-input-number :min="0" v-model="dfNodeBoxShadowHL" @change="dfNodeBoxShadowHLChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Vertical Length</span>
+             <el-input-number :min="0" v-model="dfNodeBoxShadowVL" @change="dfNodeBoxShadowVLChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Blur Radius</span>
+             <el-input-number :min="0" v-model="dfNodeBoxShadowBR" @change="dfNodeBoxShadowBRChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Spread</span>
+             <el-input-number :min="0" v-model="dfNodeBoxShadowS" @change="dfNodeBoxShadowSChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Box Shadown color</span>
+            <el-color-picker v-model="dfNodeBoxShadowColor" show-alpha @active-change="dfNodeBoxShadowColorChange" size="mini"></el-color-picker>
+          </div>
+
+
+
+          <br><strong>Hover</strong>
+
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfNodeHoverBackgroundColor" show-alpha @active-change="dfNodeHoverBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+          <div class="color">
+            <span>Text color</span>
+            <el-color-picker v-model="dfNodeHoverTextColor" show-alpha @active-change="dfNodeHoverTextColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfNodeHoverBorderSize" @change="dfNodeHoverBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfNodeHoverBorderColor" show-alpha @active-change="dfNodeHoverBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfNodeHoverBorderRadius" @change="dfNodeHoverBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+
+          <div class="number">
+            <span>Box Shadown Horitzontal Length</span>
+             <el-input-number :min="0" v-model="dfNodeHoverBoxShadowHL" @change="dfNodeHoverBoxShadowHLChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Vertical Length</span>
+             <el-input-number :min="0" v-model="dfNodeHoverBoxShadowVL" @change="dfNodeHoverBoxShadowVLChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Blur Radius</span>
+             <el-input-number :min="0" v-model="dfNodeHoverBoxShadowBR" @change="dfNodeHoverBoxShadowBRChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Spread</span>
+             <el-input-number :min="0" v-model="dfNodeHoverBoxShadowS" @change="dfNodeHoverBoxShadowSChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Box Shadown color</span>
+            <el-color-picker v-model="dfNodeHoverBoxShadowColor" show-alpha @active-change="dfNodeHoverBoxShadowColorChange" size="mini"></el-color-picker>
+          </div>
+
+
+
+          <br><strong>Selected</strong>
+
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfNodeSelectedBackgroundColor" show-alpha @active-change="dfNodeSelectedBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+          <div class="color">
+            <span>Text color</span>
+            <el-color-picker v-model="dfNodeSelectedTextColor" show-alpha @active-change="dfNodeSelectedTextColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfNodeSelectedBorderSize" @change="dfNodeSelectedBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfNodeSelectedBorderColor" show-alpha @active-change="dfNodeSelectedBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfNodeSelectedBorderRadius" @change="dfNodeSelectedBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+
+          <div class="number">
+            <span>Box Shadown Horitzontal Length</span>
+             <el-input-number :min="0" v-model="dfNodeSelectedBoxShadowHL" @change="dfNodeSelectedBoxShadowHLChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Vertical Length</span>
+             <el-input-number :min="0" v-model="dfNodeSelectedBoxShadowVL" @change="dfNodeSelectedBoxShadowVLChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Blur Radius</span>
+             <el-input-number :min="0" v-model="dfNodeSelectedBoxShadowBR" @change="dfNodeSelectedBoxShadowBRChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Box Shadown Spread</span>
+             <el-input-number :min="0" v-model="dfNodeSelectedBoxShadowS" @change="dfNodeSelectedBoxShadowSChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Box Shadown color</span>
+            <el-color-picker v-model="dfNodeSelectedBoxShadowColor" show-alpha @active-change="dfNodeSelectedBoxShadowColorChange" size="mini"></el-color-picker>
+          </div>
+
+        </el-collapse-item>
+        <el-collapse-item title="Input" name="3">
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfInputBackgroundColor" show-alpha @active-change="dfInputBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfInputBorderSize" @change="dfInputBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfInputBorderColor" show-alpha @active-change="dfInputBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfInputBorderRadius" @change="dfInputBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Left</span>
+             <el-input-number v-model="dfInputLeft" @change="dfInputLeftChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Height</span>
+             <el-input-number :min="0" v-model="dfInputHeight" @change="dfInputHeightChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Width</span>
+             <el-input-number :min="0" v-model="dfInputWidth" @change="dfInputWidthChange" size="mini"></el-input-number>
+          </div>
+
+          <br><strong>Hover</strong>
+
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfInputHoverBackgroundColor" show-alpha @active-change="dfInputHoverBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfInputHoverBorderSize" @change="dfInputHoverBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfInputHoverBorderColor" show-alpha @active-change="dfInputHoverBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfInputHoverBorderRadius" @change="dfInputHoverBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+
+        </el-collapse-item>
+        <el-collapse-item title="Output" name="4">
+
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfOutputBackgroundColor" show-alpha @active-change="dfOutputBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfOutputBorderSize" @change="dfOutputBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfOutputBorderColor" show-alpha @active-change="dfOutputBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfOutputBorderRadius" @change="dfOutputBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Right</span>
+             <el-input-number v-model="dfOutputRight" @change="dfOutputRightChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Height</span>
+             <el-input-number :min="0" v-model="dfOutputHeight" @change="dfOutputHeightChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number">
+            <span>Width</span>
+             <el-input-number :min="0" v-model="dfOutputWidth" @change="dfOutputWidthChange" size="mini"></el-input-number>
+          </div>
+
+          <br><strong>Hover</strong>
+
+          <div class="color">
+            <span>Background color</span>
+            <el-color-picker v-model="dfOutputHoverBackgroundColor" show-alpha @active-change="dfOutputHoverBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfOutputHoverBorderSize" @change="dfOutputHoverBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color">
+            <span>Border color</span>
+            <el-color-picker v-model="dfOutputHoverBorderColor" show-alpha @active-change="dfOutputHoverBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfOutputHoverBorderRadius" @change="dfOutputHoverBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+        </el-collapse-item>
+        <el-collapse-item title="Line" name="5">
+
+          <div class="number">
+            <span>Width</span>
+             <el-input-number :min="0" v-model="dfLineWidth" @change="dfLineWidthChange" size="mini"></el-input-number>
+          </div>
+          <div class="color">
+            <span>Color</span>
+            <el-color-picker v-model="dfLineColor" show-alpha @active-change="dfLineColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <br><strong>Hover</strong>
+
+          <div class="color">
+            <span>Color</span>
+            <el-color-picker v-model="dfLineHoverColor" show-alpha @active-change="dfLineHoverColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <br><strong>Selected</strong>
+
+          <div class="color">
+            <span>Color</span>
+            <el-color-picker v-model="dfLineSelectedColor" show-alpha @active-change="dfLineSelectedColorChange" size="mini"></el-color-picker>
+          </div>
+
+        </el-collapse-item>
+        <el-collapse-item title="Reroute" name="6">
+
+          <div class="number">
+            <span>Border Width</span>
+             <el-input-number :min="0" v-model="dfRerouteBorderWidth" @change="dfRerouteBorderWidthChange" size="mini"></el-input-number>
+          </div>
+          <div class="color">
+            <span>Border Color</span>
+            <el-color-picker v-model="dfRerouteBorderColor" show-alpha @active-change="dfRerouteBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="color">
+            <span>Background Color</span>
+            <el-color-picker v-model="dfRerouteBackgroundColor" show-alpha @active-change="dfRerouteBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <br><strong>Hover</strong>
+
+          <div class="number">
+            <span>Border Width</span>
+             <el-input-number :min="0" v-model="dfRerouteHoverBorderWidth" @change="dfRerouteHoverBorderWidthChange" size="mini"></el-input-number>
+          </div>
+          <div class="color">
+            <span>Border Color</span>
+            <el-color-picker v-model="dfRerouteHoverBorderColor" show-alpha @active-change="dfRerouteHoverBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="color">
+            <span>Background Color</span>
+            <el-color-picker v-model="dfRerouteHoverBackgroundColor" show-alpha @active-change="dfRerouteHoverBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+        </el-collapse-item>
+        <el-collapse-item title="Delete (Second Click)" name="7">
+
+          <div class="select">
+            <span>Type Node</span>
+            <el-select v-model="SelectDelete" placeholder="Select" size="mini" @change="ChangeDelete()">
+              <el-option
+                v-for="item in SelectDeleteOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+
+          <div class="color" v-if="SelectDelete !== 'none'">
+            <span>Color</span>
+            <el-color-picker v-model="dfDeleteColor" show-alpha @active-change="dfDeleteColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="color" v-if="SelectDelete !== 'none'">
+            <span>Background color</span>
+            <el-color-picker v-model="dfDeleteBackgroundColor" show-alpha @active-change="dfDeleteBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number" v-if="SelectDelete !== 'none'">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfDeleteBorderSize" @change="dfDeleteBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color" v-if="SelectDelete !== 'none'">
+            <span>Border color</span>
+            <el-color-picker v-model="dfDeleteBorderColor" show-alpha @active-change="dfDeleteBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number" v-if="SelectDelete !== 'none'">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfDeleteBorderRadius" @change="dfDeleteBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="number" v-if="SelectDelete !== 'none'">
+            <span>Top</span>
+             <el-input-number v-model="dfDeleteTop" @change="dfDeleteTopChange" size="mini"></el-input-number>
+          </div>
+
+          <br v-if="SelectDelete !== 'none'"><strong v-if="SelectDelete !== 'none'">Hover</strong>
+
+          <div class="color" v-if="SelectDelete !== 'none'">
+            <span>Color</span>
+            <el-color-picker v-model="dfDeleteHoverColor" show-alpha @active-change="dfDeleteHoverColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="color" v-if="SelectDelete !== 'none'">
+            <span>Background color</span>
+            <el-color-picker v-model="dfDeleteHoverBackgroundColor" show-alpha @active-change="dfDeleteHoverBackgroundColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number" v-if="SelectDelete !== 'none'">
+            <span>Border size</span>
+             <el-input-number :min="0" v-model="dfDeleteHoverBorderSize" @change="dfDeleteHoverBorderSizeChange" size="mini"></el-input-number>
+          </div>
+
+          <div class="color" v-if="SelectDelete !== 'none'">
+            <span>Border color</span>
+            <el-color-picker v-model="dfDeleteHoverBorderColor" show-alpha @active-change="dfDeleteHoverBorderColorChange" size="mini"></el-color-picker>
+          </div>
+
+          <div class="number" v-if="SelectDelete !== 'none'">
+            <span>Border Radius</span>
+             <el-input-number :min="0" v-model="dfDeleteHoverBorderRadius" @change="dfDeleteHoverBorderRadiusChange" size="mini"></el-input-number>
+          </div>
+
+        </el-collapse-item>
+      </el-collapse>
+
+    </el-col>
+  </el-row>
+
+  <el-dialog
+  title="CSS"
+  :visible.sync="dialogVisible"
+  width="50%"
+  @opened="dialogVisibleOpenend"
+  >
+  <div>
+    <pre><code id="code" class="language-css"></code></pre>
+  </div>
+  <el-button type="primary" style="width: 100%; margin-top: 10px" v-clipboard:copy="code" v-clipboard:success="copied">Copy!!</el-button>
+
+  <span slot="footer" class="dialog-footer">
+    <el-button type="primary" @click="dialogVisible = false">Close</el-button>
+  </span>
+</el-dialog>
+
+</div>
+<script src="src/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/prism.min.js" integrity="sha256-3teItwIfMuVB74Alnxw/y5HAZ2irOsCULFff3EgbtEs=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/components/prism-css.min.js" integrity="sha256-4ut/7XCv/zjtcNF9GlQL+Jpy3AuQlLt2ExXNtIjZ8Po=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-clipboard2/0.3.1/vue-clipboard.js" integrity="sha256-QkKPHK8kzQ3rk/xcXnrsn20iDG6is/Ds8oMJuawDy3s=" crossorigin="anonymous"></script>
+<style id="root-df-variables">
+  :root {
+    --dfBackgroundColor: #ffffff;
+    --dfBackgroundSize: 0px;
+    --dfBackgroundImage: none;
+
+    --dfNodeType: flex;
+    --dfNodeTypeFloat: 'none';
+    --dfNodeBackgroundColor: #ffffff;
+    --dfNodeTextColor: #000000;
+    --dfNodeBorderSize: 2px;
+    --dfNodeBorderColor: #000000;
+    --dfNodeBorderRadius: 4px;
+    --dfNodeMinHeight: 40px;
+    --dfNodeMinWidth: 160px;
+    --dfNodePaddingTop: 15px;
+    --dfNodePaddingBottom: 15px;
+    --dfNodeBoxShadowHL: 0px;
+    --dfNodeBoxShadowVL: 2px;
+    --dfNodeBoxShadowBR: 15px;
+    --dfNodeBoxShadowS: 2px;
+    --dfNodeBoxShadowColor: #000000;
+
+    --dfNodeHoverBackgroundColor: #ffffff;
+    --dfNodeHoverTextColor: #000000;
+    --dfNodeHoverBorderSize: 2px;
+    --dfNodeHoverBorderColor: #000000;
+    --dfNodeHoverBorderRadius: 4px;
+
+    --dfNodeHoverBoxShadowHL: 0px;
+    --dfNodeHoverBoxShadowVL: 2px;
+    --dfNodeHoverBoxShadowBR: 15px;
+    --dfNodeHoverBoxShadowS: 2px;
+    --dfNodeHoverBoxShadowColor: #4ea9ff;
+
+    --dfNodeSelectedBackgroundColor: #000000;
+    --dfNodeSelectedTextColor: #ffffff;
+    --dfNodeSelectedBorderSize: 2px;
+    --dfNodeSelectedBorderColor: #000000;
+    --dfNodeSelectedBorderRadius: 4px;
+
+    --dfNodeSelectedBoxShadowHL: 0px;
+    --dfNodeSelectedBoxShadowVL: 2px;
+    --dfNodeSelectedBoxShadowBR: 15px;
+    --dfNodeSelectedBoxShadowS: 2px;
+    --dfNodeSelectedBoxShadowColor: #4ea9ff;
+
+    --dfInputBackgroundColor: #ffffff;
+    --dfInputBorderSize: 2px;
+    --dfInputBorderColor: #000000;
+    --dfInputBorderRadius: 50px;
+    --dfInputLeft: -27px;
+    --dfInputHeight: 20px;
+    --dfInputWidth: 20px;
+
+    --dfInputHoverBackgroundColor: #ffffff;
+    --dfInputHoverBorderSize: 2px;
+    --dfInputHoverBorderColor: #000000;
+    --dfInputHoverBorderRadius: 50px;
+
+    --dfOutputBackgroundColor: #ffffff;
+    --dfOutputBorderSize: 2px;
+    --dfOutputBorderColor: #000000;
+    --dfOutputBorderRadius: 50px;
+    --dfOutputRight: -3px;
+    --dfOutputHeight: 20px;
+    --dfOutputWidth: 20px;
+
+    --dfOutputHoverBackgroundColor: #ffffff;
+    --dfOutputHoverBorderSize: 2px;
+    --dfOutputHoverBorderColor: #000000;
+    --dfOutputHoverBorderRadius: 50px;
+
+    --dfLineWidth: 5px;
+    --dfLineColor: #4682b4;
+    --dfLineHoverColor: #4682b4;
+    --dfLineSelectedColor: #43b993;
+
+    --dfRerouteBorderWidth: 2px;
+    --dfRerouteBorderColor: #000000;
+    --dfRerouteBackgroundColor: #ffffff;
+
+    --dfRerouteHoverBorderWidth: 2px;
+    --dfRerouteHoverBorderColor: #000000;
+    --dfRerouteHoverBackgroundColor: #ffffff;
+
+    --dfDeleteDisplay: block;
+    --dfDeleteColor: #ffffff;
+    --dfDeleteBackgroundColor: #000000;
+    --dfDeleteBorderSize: 2px;
+    --dfDeleteBorderColor: #ffffff;
+    --dfDeleteBorderRadius: 50px;
+    --dfDeleteTop: -15px;
+
+    --dfDeleteHoverColor: #000000;
+    --dfDeleteHoverBackgroundColor: #ffffff;
+    --dfDeleteHoverBorderSize: 2px;
+    --dfDeleteHoverBorderColor: #000000;
+    --dfDeleteHoverBorderRadius: 50px;
+
+
+  }
+</style>
+<style id="drawflow-theme">
+#drawflow {
+  background: var(--dfBackgroundColor);
+  background-size: var(--dfBackgroundSize) var(--dfBackgroundSize);
+  background-image: var(--dfBackgroundImage);
+}
+
+.drawflow .drawflow-node {
+  display: var(--dfNodeType);
+  background: var(--dfNodeBackgroundColor);
+  color: var(--dfNodeTextColor);
+  border: var(--dfNodeBorderSize)  solid var(--dfNodeBorderColor);
+  border-radius: var(--dfNodeBorderRadius);
+  min-height: var(--dfNodeMinHeight);
+  width: auto;
+  min-width: var(--dfNodeMinWidth);
+  padding-top: var(--dfNodePaddingTop);
+  padding-bottom: var(--dfNodePaddingBottom);
+  -webkit-box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL) var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
+  box-shadow:  var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL) var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
+}
+
+.drawflow .drawflow-node:hover {
+  background: var(--dfNodeHoverBackgroundColor);
+  color: var(--dfNodeHoverTextColor);
+  border: var(--dfNodeHoverBorderSize)  solid var(--dfNodeHoverBorderColor);
+  border-radius: var(--dfNodeHoverBorderRadius);
+  -webkit-box-shadow: var(--dfNodeHoverBoxShadowHL) var(--dfNodeHoverBoxShadowVL) var(--dfNodeHoverBoxShadowBR) var(--dfNodeHoverBoxShadowS) var(--dfNodeHoverBoxShadowColor);
+  box-shadow:  var(--dfNodeHoverBoxShadowHL) var(--dfNodeHoverBoxShadowVL) var(--dfNodeHoverBoxShadowBR) var(--dfNodeHoverBoxShadowS) var(--dfNodeHoverBoxShadowColor);
+}
+
+.drawflow .drawflow-node.selected {
+  background: var(--dfNodeSelectedBackgroundColor);
+  color: var(--dfNodeSelectedTextColor);
+  border: var(--dfNodeSelectedBorderSize)  solid var(--dfNodeSelectedBorderColor);
+  border-radius: var(--dfNodeSelectedBorderRadius);
+  -webkit-box-shadow: var(--dfNodeSelectedBoxShadowHL) var(--dfNodeSelectedBoxShadowVL) var(--dfNodeSelectedBoxShadowBR) var(--dfNodeSelectedBoxShadowS) var(--dfNodeSelectedBoxShadowColor);
+  box-shadow:  var(--dfNodeSelectedBoxShadowHL) var(--dfNodeSelectedBoxShadowVL) var(--dfNodeSelectedBoxShadowBR) var(--dfNodeSelectedBoxShadowS) var(--dfNodeSelectedBoxShadowColor);
+}
+
+.drawflow .drawflow-node .input {
+  left: var(--dfInputLeft);
+  background: var(--dfInputBackgroundColor);
+  border: var(--dfInputBorderSize)  solid var(--dfInputBorderColor);
+  border-radius: var(--dfInputBorderRadius);
+  height: var(--dfInputHeight);
+  width: var(--dfInputWidth);
+}
+
+.drawflow .drawflow-node .input:hover {
+  background: var(--dfInputHoverBackgroundColor);
+  border: var(--dfInputHoverBorderSize)  solid var(--dfInputHoverBorderColor);
+  border-radius: var(--dfInputHoverBorderRadius);
+}
+
+.drawflow .drawflow-node .outputs {
+  float: var(--dfNodeTypeFloat);
+}
+
+.drawflow .drawflow-node .output {
+  right: var(--dfOutputRight);
+  background: var(--dfOutputBackgroundColor);
+  border: var(--dfOutputBorderSize)  solid var(--dfOutputBorderColor);
+  border-radius: var(--dfOutputBorderRadius);
+  height: var(--dfOutputHeight);
+  width: var(--dfOutputWidth);
+}
+
+.drawflow .drawflow-node .output:hover {
+  background: var(--dfOutputHoverBackgroundColor);
+  border: var(--dfOutputHoverBorderSize)  solid var(--dfOutputHoverBorderColor);
+  border-radius: var(--dfOutputHoverBorderRadius);
+}
+
+.drawflow .connection .main-path {
+  stroke-width: var(--dfLineWidth);
+  stroke: var(--dfLineColor);
+}
+
+.drawflow .connection .main-path:hover {
+  stroke: var(--dfLineHoverColor);
+}
+
+.drawflow .connection .main-path.selected {
+  stroke: var(--dfLineSelectedColor);
+}
+
+.drawflow .connection .point {
+  stroke: var(--dfRerouteBorderColor);
+  stroke-width: var(--dfRerouteBorderWidth);
+  fill: var(--dfRerouteBackgroundColor);
+}
+
+.drawflow .connection .point:hover {
+  stroke: var(--dfRerouteHoverBorderColor);
+  stroke-width: var(--dfRerouteHoverBorderWidth);
+  fill: var(--dfRerouteHoverBackgroundColor);
+}
+
+.drawflow-delete {
+  display: var(--dfDeleteDisplay);
+  color: var(--dfDeleteColor);
+  background: var(--dfDeleteBackgroundColor);
+  border: var(--dfDeleteBorderSize) solid var(--dfDeleteBorderColor);
+  border-radius: var(--dfDeleteBorderRadius);
+}
+
+.parent-node .drawflow-delete {
+  top: var(--dfDeleteTop);
+}
+
+.drawflow-delete:hover {
+  color: var(--dfDeleteHoverColor);
+  background: var(--dfDeleteHoverBackgroundColor);
+  border: var(--dfDeleteHoverBorderSize) solid var(--dfDeleteHoverBorderColor);
+  border-radius: var(--dfDeleteHoverBorderRadius);
+}
+</style>
+</body>
+</html>

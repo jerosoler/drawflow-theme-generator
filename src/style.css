@@ -1,0 +1,79 @@
+html, body {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #393C44;
+  font-family: 'Roboto', sans-serif;
+}
+
+#header {
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #E8E8EF;
+}
+
+#header h1 {
+  line-height: 60px;
+  margin-left: 20px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.exportButton {
+  float: right;
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+
+.el-dialog__body pre {
+  border-radius: 4px;
+}
+
+.panel {
+  display: block;
+  height: calc(100vh - 61px);
+}
+.drawflow-div {
+  height: calc(100vh - 61px);
+}
+.col-right {
+  border-left: 1px solid #E8E8EF;
+  height: calc(100vh - 61px);
+  overflow: auto;
+}
+
+#drawflow {
+  width: 100%;
+  height: calc(100vh - 61px);
+  min-height: 300px;
+}
+
+.el-collapse-item__header {
+  padding-left: 10px;
+  font-weight: bold;
+}
+
+.el-collapse-item__content {
+  padding-left: 10px;
+}
+
+.el-collapse-item__content > div {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.el-collapse-item__content .color {
+  display: flex;
+}
+
+.el-collapse-item__content .color > span, .el-collapse-item__content .number > span, .el-collapse-item__content .select > span {
+  margin-right: 10px;
+  line-height: 28px;
+}
+
+.el-input-number--mini {
+  width: 100px;
+}
